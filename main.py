@@ -1,68 +1,45 @@
 import sys
 from PyQt5 import QtWidgets
-from user_interface import Ui_MainWindow  # предполагается, что вы используете Qt Designer
+from user_interface import Ui_MainWindow  # Интерфейс, созданный в Qt Designer
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # Создаём интерфейс
+        # Загружаем интерфейс
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # Настраиваем слайдеры
-        self.setup_sliders()
+        # Настройка слайдеров
+        self.ui.horizontalSliderDown.valueChanged.connect(
+            lambda value: self.ui.horizontalSliderDownTextBar.setText(str(value) + "%")
+        )
+        self.ui.verticalSliderRight.valueChanged.connect(
+            lambda value: self.ui.verticalSliderRightTextBar.setText(str(value) + "%")
+        )
 
-        # Обновляем текст на слайдерах при запуске
-        self.update_slider_texts()
+        # Обновим значения слайдеров при запуске
+        self.ui.horizontalSliderDownTextBar.setText(str(self.ui.horizontalSliderDown.value()) + "%")
+        self.ui.verticalSliderRightTextBar.setText(str(self.ui.verticalSliderRight.value()) + "%")
 
-        # Настраиваем кнопки
-        self.setup_buttons()
+        # Подключение кнопок с помощью lambda
+        self.ui.pushButtonLeft.clicked.connect(
+            lambda: self.toggle_text(self.ui.textLeft)
+        )
+        self.ui.pushButtonMid.clicked.connect(
+            lambda: self.toggle_text(self.ui.textMid)
+        )
+        self.ui.pushButtonRight.clicked.connect(
+            lambda: self.toggle_text(self.ui.textRight)
+        )
 
-        # Устанавливаем начальное состояние текста на кнопках
-        self.set_initial_button_states()
-
-    def setup_sliders(self):
-        # Когда пользователь двигает слайдер, вызывается функция для обновления текста
-        self.ui.horizontalSliderDown.valueChanged.connect(self.horizontal_slider_changed)
-        self.ui.verticalSliderRight.valueChanged.connect(self.vertical_slider_changed)
-
-    def horizontal_slider_changed(self, value):
-        # Обновляем текст рядом с горизонтальным слайдером
-        self.ui.horizontalSliderDownTextBar.setText(str(value) + "%")
-
-    def vertical_slider_changed(self, value):
-        # Обновляем текст рядом с вертикальным слайдером
-        self.ui.verticalSliderRightTextBar.setText(str(value) + "%")
-
-    def update_slider_texts(self):
-        # Устанавливаем текст по текущему значению слайдера при запуске
-        self.horizontal_slider_changed(self.ui.horizontalSliderDown.value())
-        self.vertical_slider_changed(self.ui.verticalSliderRight.value())
-
-    def setup_buttons(self):
-        # Подключаем кнопки к функциям
-        self.ui.pushButtonLeft.clicked.connect(self.toggle_left)
-        self.ui.pushButtonMid.clicked.connect(self.toggle_mid)
-        self.ui.pushButtonRight.clicked.connect(self.toggle_right)
-
-    def set_initial_button_states(self):
-        # Начальное состояние — выключено (Off)
+        # Установка начального состояния кнопок
         self.set_off(self.ui.textLeft)
         self.set_off(self.ui.textMid)
         self.set_off(self.ui.textRight)
 
-    def toggle_left(self):
-        self.toggle(self.ui.textLeft)
-
-    def toggle_mid(self):
-        self.toggle(self.ui.textMid)
-
-    def toggle_right(self):
-        self.toggle(self.ui.textRight)
-
-    def toggle(self, label):
-        # Если сейчас Off — включаем, иначе выключаем
+    def toggle_text(self, label):
+        # Меняет текст и цвет: если "Off" → "On", иначе обратно
         if label.text() == "Off":
             self.set_on(label)
         else:
